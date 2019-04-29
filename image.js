@@ -1,31 +1,24 @@
-"use strict";
-
-document.getElementById("add-btn").addEventListener("click", AddPhoto);
+"use strict";	
+document.getElementById("add-btn").addEventListener("click", AddPicture);
 document.getElementById("delete-btn").addEventListener("click", DeletePhoto);
 
-
-function validateURL(url){
-  var regex = new RegExp("^(https?:\\/\\/)?"+ // protocol
-    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|"+ // domain name
-    "((\\d{1,3}\\.){3}\\d{1,3}))"+ // OR ip (v4) address
-    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*"+ // port and path
-    "(\\?[;&a-z\\d%_.~+=-]*)?"+ // query string
-    "(\\#[-a-z\\d_]*)?$","i");
-  return !!regex.test(url);
-}
-
-
-function AddPhoto(){
-  var user_url = ($("image-url").value);
-  var img = document.createElement("img");
-
-
-  if(validateURL(user_url)){
-   
-    img.src = user_url;
-    img.className = "planning-img";
-    img.id = "img_" + document.getElementsByTagName("img").length;
-    $("planning-area").appendChild(img);
+function URLvalidator(url){
+	var regex = new RegExp("^(https?:\\/\\/)?"+
+	    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|"+
+	    "((\\d{1,3}\\.){3}\\d{1,3}))"+
+	    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*"+
+	    "(\\?[;&a-z\\d%_.~+=-]*)?"+
+	    "(\\#[-a-z\\d_]*)?$","i");
+	  return !!regex.test(url);
+	}
+	function AddPicture(){
+	  var user_url = ($("image-url").value);
+      var img = document.createElement("img");
+	  if(validateURL(user_url)){
+	    img.src = user_url;
+	    img.className = "planning-img";
+		img.id = "img_" + document.getElementsByTagName("img").length;
+$("planning-area").appendChild(img);
     $("image-url").value = "";
   }
   else{
