@@ -1,59 +1,107 @@
-"use strict";	
-document.getElementById("add-btn").addEventListener("click", AddPicture);
-document.getElementById("delete-btn").addEventListener("click", DeletePhoto);
-
-function URLvalidator(url){
-	var regex = new RegExp("^(https?:\\/\\/)?"+
-	    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|"+
-	    "((\\d{1,3}\\.){3}\\d{1,3}))"+
-	    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*"+
-	    "(\\?[;&a-z\\d%_.~+=-]*)?"+
-	    "(\\#[-a-z\\d_]*)?$","i");
-	  return !!regex.test(url);
-	}
-	function AddPicture(){
-	  var user_url = ($("image-url").value);
-      var img = document.createElement("img");
-	  if(validateURL(user_url)){
-	    img.src = user_url;
-	    img.className = "planning-img";
-		img.id = "img_" + document.getElementsByTagName("img").length;
-$("planning-area").appendChild(img);
-    $("image-url").value = "";
-  }
-  else{
-    $("url-error").classList.toggle("alert");
-  }
-}
-function GrabImage(delete_url){
-  var imgs = document.getElementsByTagName("img");
-  var return_value = null;
-  Array.prototype.forEach.call(imgs, function(images){
-    if(images.src == delete_url){
-      return_value = images;
+var LoginModalController = {
+    tabsElementName: ".logmod__tabs li",
+    tabElementName: ".logmod__tab",
+    inputElementsName: ".logmod__form .input",
+    hidePasswordName: ".hide-password",
+    
+    inputElements: null,
+    tabsElement: null,
+    tabElement: null,
+    hidePassword: null,
+    
+    activeTab: null,
+    tabSelection: 0, // 0 - first, 1 - second
+    
+    findElements: function () {
+        var base = this;
+        
+        base.tabsElement = $(base.tabsElementName);
+        base.tabElement = $(base.tabElementName);
+        base.inputElements = $(base.inputElementsName);
+        base.hidePassword = $(base.hidePasswordName);
+        
+        return base;
+    },
+    
+    setState: function (state) {
+      var base = this,
+            elem = null;
+        
+        if (!state) {
+            state = 0;
+        }
+        
+        if (base.tabsElement) {
+          elem = $(base.tabsElement[state]);
+            elem.addClass("current");
+            $("." + elem.attr("data-tabtar")).addClass("show");
+        }
+  
+        return base;
+    },
+    
+    getActiveTab: function () {
+        var base = this;
+        
+        base.tabsElement.each(function (i, el) {
+           if ($(el).hasClass("current")) {
+               base.activeTab = $(el);
+           }
+        });
+        
+        return base;
+    },
+   
+    addClickEvents: function () {
+      var base = this;
+        
+        base.hidePassword.on("click", function (e) {
+            var $this = $(this),
+                $pwInput = $this.prev("input");
+            
+            if ($pwInput.attr("type") == "password") {
+                $pwInput.attr("type", "text");
+                $this.text("Hide");
+            } else {
+                $pwInput.attr("type", "password");
+                $this.text("Show");
+            }
+        });
+ 
+        base.tabsElement.on("click", function (e) {
+            var targetTab = $(this).attr("data-tabtar");
+            
+            e.preventDefault();
+            base.activeTab.removeClass("current");
+            base.activeTab = $(this);
+            base.activeTab.addClass("current");
+            
+            base.tabElement.each(function (i, el) {
+                el = $(el);
+                el.removeClass("show");
+                if (el.hasClass(targetTab)) {
+                    el.addClass("show");
+                }
+            });
+        });
+        
+        base.inputElements.find("label").on("click", function (e) {
+           var $this = $(this),
+               $input = $this.next("input");
+            
+            $input.focus();
+        });
+        
+        return base;
+    },
+    
+    initialize: function () {
+        var base = this;
+        
+        base.findElements().setState().getActiveTab().addClickEvents();
     }
-  });
-  return return_value;
-}
-function DeletePhoto(){
-  var remove_url = ($("image-url").value);
-  var remove_img;
-  if(validateURL(remove_url)){
-    remove_img = GrabImage(remove_url);
-    $("planning-area").removeChild(remove_img);
-    $("image-url").value = "";
-  }
-  else{
-    $("url-error").classList.toggle("alert");
-  }
-}
-var getImageURL = function() {
-  document.onclick = function(e) {
-    if (e.target.tagName == "IMG"){
-      var image = e.target.getAttribute("src");
-      $("image-url").value = image;
-    }
-  };
 };
 
-getImageURL();
+$(document).ready(function() {
+    LoginModalController.initialize();
+});
